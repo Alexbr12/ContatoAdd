@@ -1,18 +1,17 @@
 package com.pucmgcoreu.contatoadd;
 
-import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.design.widget.TextInputEditText;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 import com.google.gson.Gson;
 
 import java.net.URLEncoder;
@@ -20,13 +19,16 @@ import java.net.URLEncoder;
 public class ContatoActivity extends AppCompatActivity {
     public static final String EXTRA_REPLY = "REPLY";
 
+    protected Pessoa p;
     public static final int RESULT = 10;
     private TextInputEditText nome;
     private TextInputEditText telefoneFixo;
     private TextInputEditText telefoneCelular;
     private TextInputEditText email;
+    private Intent replyIntent;
+    private AlertDialog alerta;
 
-    private  Intent replyIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +57,13 @@ public class ContatoActivity extends AppCompatActivity {
 
 
     public void salvar(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         replyIntent = new Intent();
 
+
+
         try{
-            Pessoa p = new Pessoa();
+            p = new Pessoa();
             {
                 p.setNome(nome.getText().toString());
                 p.setTelefoneCelular(telefoneCelular.getText().toString());
@@ -74,9 +79,37 @@ public class ContatoActivity extends AppCompatActivity {
             intent.putExtra(ContactsContract.Intents.Insert.SECONDARY_PHONE, p.getTelefoneCelular());
             intent.putExtra(ContactsContract.Intents.Insert.EMAIL, p.getEmail());
 
-            sendWhatsApp(p.getTelefoneCelular());
-
-            sendEmail();
+//            if(p.getTelefoneCelular() != null && p.getTelefoneCelular().length() == 11){
+//                sendWhatsApp(p.getTelefoneCelular());
+//            } else {
+//                builder.setTitle("Numero de celular incorrreto!");
+//                builder.setMessage("Insira um numero com 11 digitos (incluindo DDD)");
+//
+//                builder.setNeutralButton("Entendido", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface arg0, int arg1) {
+//                        Toast.makeText(ContatoActivity.this, "Mensagem Whatsapp não enviada.", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//
+//                alerta = builder.create();
+//                alerta.show();
+//            }
+//
+//            if(p.getEmail() != null && p.getEmail().contains("@")) {
+//                sendEmail();
+//            } else {
+//                builder.setTitle("E-mail incorrreto!");
+//                builder.setMessage("Insira um E-mail válido.");
+//
+//                builder.setNeutralButton("Entendido", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface arg0, int arg1) {
+//                        Toast.makeText(ContatoActivity.this, "E-mail não enviado.", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//
+//                alerta = builder.create();
+//                alerta.show();
+//            }
 
             Gson gson = new Gson();
             String data = gson.toJson(p);
@@ -120,6 +153,12 @@ public class ContatoActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        Intent intent = getIntent();
+//        intent.getCharSequenceArrayExtra(ContactsContract.Intents.Insert.NAME);
+
+            sendWhatsApp((p.getTelefoneCelular()));
+
+            Toast.makeText(this,"Tesste de toast", Toast.LENGTH_SHORT).show();
         if (requestCode == RESULT) {
             setResult(RESULT_OK, replyIntent);
            // finish();

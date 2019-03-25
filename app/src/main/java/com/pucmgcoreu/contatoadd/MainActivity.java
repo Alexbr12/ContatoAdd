@@ -1,12 +1,14 @@
 package com.pucmgcoreu.contatoadd;
 
 import android.Manifest;
+import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,19 +27,13 @@ import android.view.View;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.gson.Gson;
 
-import java.util.Arrays;
 import java.util.List;
+
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -45,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private PessoaViewModel viewModel;
     private RecyclerView recyclerView;
     private LoginButton loginButton;
-   // private MainActivity callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
 
         setTitle("Lista de contatos");
@@ -86,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-    }
 
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -106,8 +104,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                    Toast.LENGTH_SHORT).show();
         }
 
-        MainActivity callbackManager = new MainActivity();
-//        callbackManager.onActivityResult(requestCode, resultCode, data); ###Resolver depois#########
+ //       MainActivity callbackManager = new MainActivity();
+ //       callbackManager.onActivityResult(requestCode, resultCode, data); //###Resolver depois#########
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -144,15 +142,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_send) {
 
+        } else if (id == R.id.login) {
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_teste);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    
 
     class Task extends AsyncTask<Pessoa, Void, List<Pessoa>> {
-
         private Context context;
 
         Task(Context context){
